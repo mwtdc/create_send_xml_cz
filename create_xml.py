@@ -956,8 +956,6 @@ if __name__ == "__main__":
             CERTIFICATE = CERTIFICATE_ITEM.GetInfo(0)
             # получаем отпечаток сертификата
             THUMBPRINT_CERT = CERTIFICATE_ITEM.Thumbprint
-            # добавляем отпечаток в конфиг для ini файла
-            E_MAIL_CONFIG["CertSign"] = str(THUMBPRINT_CERT).lower()
             # создаем словарь с сертификатами, чтобы при проверке
             # отчетов с атс второй раз не искать сертификаты
             CERTIFICATES_DICT.setdefault(
@@ -967,6 +965,7 @@ if __name__ == "__main__":
                     "THUMBPRINT_CERT": THUMBPRINT_CERT,
                 },
             )
+        print(CERTIFICATES_DICT)
 
         for COMPANY in LIST_OF_COMPANIES:
             company_dataframe = pd.DataFrame(
@@ -1009,6 +1008,10 @@ if __name__ == "__main__":
                     PATH_TO_XML,
                 )
 
+            # добавляем отпечаток в конфиг для ini файла
+            E_MAIL_CONFIG["CertSign"] = str(
+                CERTIFICATES_DICT[COMPANY]["THUMBPRINT_CERT"]
+            ).lower()
             create_config_and_bat(
                 COMPANY,
                 WORK_PATH,
@@ -1035,7 +1038,7 @@ if __name__ == "__main__":
 
     # ждем 5 минут после отправки ценовых
     # чтобы они успели приняться и появиться в мониторинге на сайте атс
-    # sleep(TIMEOUT_BEFORE_CHECK_CZ)
+    sleep(TIMEOUT_BEFORE_CHECK_CZ)
     for COMPANY in LIST_OF_COMPANIES:
         # создание нового экземпляра WinHTTP.WinHTTPRequest.5.1
         XMLHTTP = win32com.client.Dispatch("WinHTTP.WinHTTPRequest.5.1")
@@ -1062,3 +1065,4 @@ if __name__ == "__main__":
     delta = end_time - start_time
     print(end_time)
     print(delta)
+
